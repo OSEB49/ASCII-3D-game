@@ -1,12 +1,13 @@
-#include <iostream>
+#include<iostream>
 #include<chrono>
 #include<vector>
 #include<algorithm>
-#include<stdio.h>
-#include <Windows.h>
+
 using namespace std;
+#include<stdio.h>
+#include<Windows.h>
 
-
+//columns and rows 
 int ScreenWidth = 120;
 int ScreenHeight = 40;
 //player's x,y and angle position
@@ -16,7 +17,7 @@ float FPA = 0.0f;
 int MapWidth = 16;
 int MapHeight = 16;
 
-float ViewRange = 3.14159 / 4.0;
+float ViewRange = 3.14159f / 4.0f;
 float MaxDepth = 16.0f;
 float Speed = 5.0f;
 
@@ -29,23 +30,23 @@ int main() {
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
 
-	//map line by line
+	//map line by line, # symbols indicate walls, . are the space between them
 	wstring map;
-	map += L"#######.........";
+	map += L"################";
 	map += L"#..............#";
-	map += L"#.........######";
+	map += L"#.......########";
 	map += L"#..............#";
-	map += L"#.......##.....#";
-	map += L"#.......###....#";
-	map += L"#.#.#.#.#....###";
-	map += L"#.....###......#";
+	map += L"#......##......#";
+	map += L"#......##......#";
 	map += L"#..............#";
+	map += L"###............#";
+	map += L"##.............#";
+	map += L"#......####..###";
+	map += L"#......#.......#";
 	map += L"#......#.......#";
 	map += L"#..............#";
-	map += L"#........##....#";
+	map += L"#......#########";
 	map += L"#..............#";
-	map += L"#....########..#";
-	map += L"###............#";
 	map += L"################";
 
 	auto tp1 = chrono::system_clock::now();
@@ -60,26 +61,30 @@ int main() {
 
 		//rotation and movement of character
 		if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
+		
 			FPA -= (Speed * 0.75f) * ElapsedTime;
+		
 		if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
+		
 			FPA += (Speed * 0.75f) * ElapsedTime;
+		
 		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
-			FPA += sinf(FPA) * Speed * ElapsedTime;
+			FPX += sinf(FPA) * Speed * ElapsedTime;
 			FPY += cosf(FPA) * Speed * ElapsedTime;
 			if (map.c_str()[(int)FPX * MapWidth + (int)FPY] == '#') {
-				FPA -= sinf(FPA) * Speed * ElapsedTime;
+				FPX -= sinf(FPA) * Speed * ElapsedTime;
 				FPY -= cosf(FPA) * Speed * ElapsedTime;
 			}
 		}
 
 		if (GetAsyncKeyState((unsigned short)'S') & 0x8000)
 		{
-			FPX -= sinf(FPA) * Speed * ElapsedTime;;
-			FPY -= cosf(FPA) * Speed * ElapsedTime;;
+			FPX -= sinf(FPA) * Speed * ElapsedTime;
+			FPY -= cosf(FPA) * Speed * ElapsedTime;
 			if (map.c_str()[(int)FPX * MapWidth + (int)FPY] == '#')
 			{
-				FPX -= sinf(FPA) * Speed * ElapsedTime;;
-				FPY -= cosf(FPA) * Speed * ElapsedTime;;
+				FPX -= sinf(FPA) * Speed * ElapsedTime;
+				FPY -= cosf(FPA) * Speed * ElapsedTime;
 			}
 		}
 
@@ -112,13 +117,10 @@ int main() {
 					WallDistance = MaxDepth;
 				}
 				else {
-					if (map.c_str()[TestY * MapWidth + TestX] == '#') {
+					if (map.c_str()[TestX * MapWidth + TestY] == '#') {
 						HitTheWall = true;
 
-						// To highlight tile boundaries, cast a ray from each corner
-						// of the tile, to the player. The more coincident this ray
-						// is to the rendering ray, the closer we are to a tile 
-						// boundary, which we'll shade to add detail to the walls
+			
 						vector<pair<float, float>> p;
 
 						// Test each corner of hit tile, storing the distance from
@@ -138,10 +140,10 @@ int main() {
 						sort(p.begin(), p.end(), [](const pair<float, float>& left, const pair<float, float>& right) {return left.first < right.first; });
 
 						// First two/three are closest (we will never see all four)
-						float fBound = 0.01;
-						if (acos(p.at(0).second) < fBound) Boundary = true;
-						if (acos(p.at(1).second) < fBound) Boundary = true;
-						if (acos(p.at(2).second) < fBound) Boundary = true;
+						float Bound = 0.01;
+						if (acos(p.at(0).second) < Bound) Boundary = true;
+						if (acos(p.at(1).second) < Bound) Boundary = true;
+						if (acos(p.at(2).second) < Bound) Boundary = true;
 					}
 				}
 
@@ -154,6 +156,7 @@ int main() {
 			if (WallDistance <= MaxDepth / 4.0f)     Shade = 0x2588;
 			else if (WallDistance < MaxDepth / 3.0f) Shade = 0x2593;
 			else if (WallDistance < MaxDepth / 2.0f) Shade = 0x2592;
+			else if (WallDistance < MaxDepth)		 Shade = 0x2591;
 			else                                     Shade = ' ';
 
 			if (Boundary) Shade = ' ';
@@ -179,7 +182,7 @@ int main() {
 		}
 
 		// Display Stats
-		swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", FPX, FPY, FPA, 1.0f / ElapsedTime);
+		swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", FPX, FPY, FPA, 1.0f/ElapsedTime);
 
 		// Display Map
 		for (int nx = 0; nx < MapWidth; nx++)
