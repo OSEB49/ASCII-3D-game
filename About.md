@@ -3,7 +3,7 @@ Simple 3D-pretended console game based on ASCII code.
 Color of walls depends on distance between our position and steps to the wall(area is built from 16 rows and columns), what makes fake 3D immersion.
 Area is defined by ASCII symbols, which indicate walls(# symbols) and walk space(.(dot) symbols).
 
-We know our position thanks to the minimap tracking our position.
+We know our position thanks to the minimap tracking our position(letter P).
 ![image](https://user-images.githubusercontent.com/84204929/187273060-11566b3f-6800-4b65-a053-f907becb60d3.png)
 About immersion:
 GREY WALL means we are far away from the wall
