@@ -61,13 +61,13 @@ int main() {
 
 		//rotation and movement of character
 		if (GetAsyncKeyState((unsigned short)'A') & 0x8000)
-		
+
 			FPA -= (Speed * 0.75f) * ElapsedTime;
-		
+
 		if (GetAsyncKeyState((unsigned short)'D') & 0x8000)
-		
+
 			FPA += (Speed * 0.75f) * ElapsedTime;
-		
+
 		if (GetAsyncKeyState((unsigned short)'W') & 0x8000) {
 			FPX += sinf(FPA) * Speed * ElapsedTime;
 			FPY += cosf(FPA) * Speed * ElapsedTime;
@@ -106,7 +106,7 @@ int main() {
 			float EyeY = cosf(RayAngle);
 
 			while (!HitTheWall && WallDistance < MaxDepth) {
-				WallDistance += 0.1f;
+				WallDistance += StepSize;
 
 				int TestX = (int)(FPX + EyeX * WallDistance);
 				int TestY = (int)(FPY + EyeY * WallDistance);
@@ -120,7 +120,7 @@ int main() {
 					if (map.c_str()[TestX * MapWidth + TestY] == '#') {
 						HitTheWall = true;
 
-			
+
 						vector<pair<float, float>> p;
 
 						// Test each corner of hit tile, storing the distance from
@@ -165,7 +165,7 @@ int main() {
 					if (y <= Celling)
 						screen[y * ScreenWidth + x] = ' ';
 					else if (y > Celling && y <= Floor)
-						screen[y * ScreenWidth + x] = '#';
+						screen[y * ScreenWidth + x] = Shade;
 					else
 					{
 						// Shade floor based on distance
@@ -182,7 +182,7 @@ int main() {
 		}
 
 		// Display Stats
-		swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", FPX, FPY, FPA, 1.0f/ElapsedTime);
+		swprintf_s(screen, 40, L"X=%3.2f, Y=%3.2f, A=%3.2f FPS=%3.2f ", FPX, FPY, FPA, 1.0f / ElapsedTime);
 
 		// Display Map
 		for (int nx = 0; nx < MapWidth; nx++)
